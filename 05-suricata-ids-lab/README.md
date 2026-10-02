@@ -45,7 +45,7 @@ nmap -sV 192.168.56.102
 ```
 Result: 2 alerts fired, *"Applayer Detect protocol only one direction"*, triggered by Nmap's version probes against PostgreSQL (port 5432) not completing a normal handshake.
  
-![Suricata alerts for the Nmap version scan](./05-suricata-01-nmap-scan-detected.png)
+![Suricata alerts for the Nmap version scan](./01-nmap-scan-detected.png)
  
 **Aggressive scan:**
 ```bash
@@ -53,7 +53,7 @@ nmap -sS -A 192.168.56.102
 ```
 Result: significantly more alerts, spanning multiple ports and protocols, including SMB malformed request alerts (port 445, likely from `-A`'s default script enumeration) and protocol mismatch alerts on ports 21 and 25.
  
-![Suricata alerts for the aggressive Nmap scan](./05-suricata-02-aggressive-scan-detected.png)
+![Suricata alerts for the aggressive Nmap scan](./02-aggressive-scan-detected.png)
  
 **Finding:** Suricata's default ruleset reliably detects reconnaissance activity, and detection volume and breadth scale with how intrusive the scan technique is.
  
@@ -68,7 +68,8 @@ msf > run
 ```
 Result: the exploit succeeded and a Meterpreter session was opened, confirming full compromise of the target. However, **no new Suricata alerts were generated**, either at the moment of exploitation or during subsequent post-exploitation activity (`sysinfo`, shell commands).
  
-![Exploit succeeded with no new Suricata alerts](./05-suricata-03-exploit-detection-gap.png)
+![Metasploit exploit succeeds against the target](./03-metasploit-exploit-success.png)
+![No new Suricata alerts after the exploit](./04-exploit-detection-gap.png)
  
 **Finding:** the default Emerging Threats Open ruleset has no signature covering this specific exploit technique. Reconnaissance was detected; actual exploitation was not. This is a real and reproducible detection gap.
  
@@ -85,9 +86,9 @@ alert tcp any any -> any 6200 (msg:"Possible vsftpd 2.3.4 backdoor connection at
 1. Added the rule to `local.rules` and referenced it in `suricata.yaml` under `rule-files`.
 2. On restart, Suricata logged a warning: `No rule files match the pattern /var/lib/suricata/rules/local.rules`. The rule had been saved to `/etc/suricata/rules/`, but Suricata's `default-rule-path` pointed to `/var/lib/suricata/rules/`. Copying the file to the correct path resolved this.
 3. Restarted Suricata cleanly with no warnings.
-![Custom rule added to local.rules](./05-suricata-05-local-rule-added.png)
-![Rule file linked in suricata.yaml](./05-suricata-06-rule-file-linked.png)
-![Suricata restarted with no warnings](./05-suricata-07-suricata-restarted.png)
+![Custom rule added to local.rules](./05-local-rule-added.png)
+![Rule file linked in suricata.yaml](./06-rule-file-linked.png)
+![Suricata restarted with no warnings](./07-suricata-restarted.png)
  
 **Result:** re-running the exploit immediately produced alerts from the custom rule:
 ```
@@ -95,7 +96,7 @@ alert tcp any any -> any 6200 (msg:"Possible vsftpd 2.3.4 backdoor connection at
 {TCP} 192.168.56.103:38475 -> 192.168.56.102:6200
 ```
  
-![Custom rule triggered during the exploit](./05-suricata-08-custom-rule-triggered.png)
+![Custom rule triggered during the exploit](./08-custom-rule-triggered.png)
  
 ## MITRE ATT&CK Mapping
  
