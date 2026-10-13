@@ -109,4 +109,4 @@ Restrict the `/api/Users/{id}` endpoint to admin-only access with proper role ve
 **MITRE ATT&CK:** T1078, Valid Accounts
  
 ---
-[← Back to Project 3 overview](../README.md)
+
